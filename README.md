@@ -1,96 +1,93 @@
-# AIVOA-QMS Frontend
+# AIVOA-QMS — Complaint Review Interface
 
-## Overview
+AIVOA-QMS is a pharmaceutical complaint-management system built around a simple problem: complaint data often arrives as unstructured text or documents, while quality teams need structured records, risk assessment, traceability, and a consistent review workflow.
 
-AIVOA-QMS Frontend is the user interface for the AI-Powered Pharmaceutical Quality Management System. Built with React and Redux Toolkit, it provides an interactive interface for logging customer complaints, uploading documents, reviewing AI-generated risk assessments, and managing complaint workflows.
+This repository contains the frontend of that system. It gives a quality user one place to submit a complaint, review the extracted information, inspect the AI-assisted assessment, and move the complaint through its lifecycle.
 
----
+## What the product does
 
-## Features
+- Complaint entry from natural-language text
+- PDF/document upload
+- AI-assisted extraction into a structured complaint record
+- Completeness checks before review
+- Risk-assessment results and supporting information
+- Root-cause and CAPA suggestions
+- Duplicate-complaint warnings
+- Complaint status and lifecycle management
 
-- Natural language complaint input
-- PDF and document upload
-- AI-assisted complaint extraction
-- Structured complaint form
-- Complaint completeness validation
-- AI Risk Assessment dashboard
-- Root cause and CAPA recommendations
-- Duplicate complaint warnings
-- Complaint lifecycle management
-- Real-time integration with FastAPI backend
+AI is used to assist the workflow rather than replace the user's review.
 
----
+## Product flow
 
-## Technology Stack
+```text
+Complaint text / document
+          ↓
+   Extraction interface
+          ↓
+ Structured complaint record
+          ↓
+ Completeness + duplicate checks
+          ↓
+    Risk assessment
+          ↓
+ Human review / lifecycle update
+```
 
-- React.js
+The frontend communicates with the companion FastAPI backend through HTTP APIs. Redux Toolkit manages application state and Axios handles the API layer.
+
+## Architecture
+
+```text
+React UI
+   │
+   ├── Complaint entry
+   ├── Document upload
+   ├── Review panels
+   └── Risk assessment views
+          │
+          ▼
+     Redux Toolkit
+          │
+          ▼
+        Axios
+          │
+          ▼
+   AIVOA-QMS Backend
+```
+
+## Tech stack
+
+- React 19
 - Redux Toolkit
+- React Router
 - Vite
 - Axios
 - JavaScript
-- HTML5
-- CSS3
+- HTML/CSS
 
----
+## Run locally
 
-## Project Structure
-
-```text
-AIVOA-QMS/
-│── src/
-│   ├── components/
-│   ├── store/
-│   ├── App.jsx
-│   └── main.jsx
-│── public/
-│── package.json
-│── vite.config.js
+```bash
+npm install
+npm run dev
 ```
 
----
+For a production build:
 
-## Application Flow
-
-```text
-User Prompt / Document Upload
-            │
-            ▼
-     React Components
-            │
-            ▼
-      Redux Toolkit
-            │
-            ▼
-        Axios API
-            │
-            ▼
-      FastAPI Backend
-            │
-            ▼
-      AI Processing
-            │
-            ▼
- Updated Complaint Form
-            │
-            ▼
- AI Risk Assessment Panel
+```bash
+npm run build
 ```
 
----
+## Related repository
 
+The API, AI workflow, database layer, and complaint-processing logic live in the companion **AIVOA-QMS-Backend** repository.
 
-## Backend
+## Project status
 
-This frontend communicates with the AIVOA-QMS Backend developed using FastAPI, LangGraph, SQLAlchemy, and MySQL.
-
----
+This is a working product-oriented prototype. The interface and API workflow are designed around an actual complaint-review process. Enterprise authentication, permissions, audit infrastructure, and regulated validation are outside the scope of this project.
 
 ## Author
 
-**T. Rushendar Reddy**
-
-B.Tech in Artificial Intelligence and Machine Learning
-
-Vignan University
-
-Hyderabad,Telangana
+**T. Rushendar Reddy**  
+B.Tech — Artificial Intelligence and Machine Learning  
+Vignan University, Hyderabad
