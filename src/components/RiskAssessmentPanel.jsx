@@ -1,5 +1,3 @@
-import React from 'react';
-
 const RiskAssessmentPanel = ({ riskData }) => {
   if (!riskData) {
     return (
