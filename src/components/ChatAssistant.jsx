@@ -1,23 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { getComplaints } from '../services/api';
 
-const ComplaintList = () => {
+// Was named ComplaintList, which duplicated the component in ComplaintList.jsx
+// and made stack traces ambiguous.
+const ChatAssistant = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchComplaints = async () => {
+  const fetchComplaints = async (signal) => {
     try {
-      const response = await axios.get('http://localhost:8000/api/complaints');
+      const response = await getComplaints({ signal });
       setComplaints(response.data);
     } catch (error) {
-      console.error('Error fetching complaints from MySQL:', error);
+      if (error.name === 'CanceledError') return;
+      console.error('Error fetching complaints:', error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchComplaints();
+    const controller = new AbortController();
+    // The rule flags any setState reachable from an effect body. Here both
+    // setComplaints and setLoading run after `await getComplaints(...)`
+    // resolves, so nothing is set synchronously and there is no cascading
+    // render. Moving the fetch into a useEffect callback that returns a
+    // promise would break the cleanup contract.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchComplaints(controller.signal);
+    return () => controller.abort();
   }, []);
 
   return (
@@ -81,4 +92,4 @@ const ComplaintList = () => {
   );
 };
 
-export default ComplaintList;
+export default ChatAssistant;

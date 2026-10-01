@@ -1,32 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setComplaintsList } from '../store/complaintSlice';
-import axios from 'axios';
+import { getComplaints, updateComplaintStatus } from '../services/api';
 
 const ComplaintList = () => {
   const dispatch = useDispatch();
   const complaints = useSelector((state) => state.complaints.complaintsList);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
-  useEffect(() => {
-    fetchComplaints();
-  }, []);
-
-  const fetchComplaints = async () => {
+  // useCallback keeps the identity stable so the effect below does not
+  // re-fire on every render. The AbortController stops the in-flight request
+  // if the component unmounts before it resolves.
+  const fetchComplaints = useCallback(async (signal) => {
     try {
-      const response = await axios.get('http://localhost:8000/api/complaints');
+      const response = await getComplaints({ signal });
       dispatch(setComplaintsList(response.data));
     } catch (error) {
-      console.error('Error fetching complaints from MySQL:', error);
+      if (error.name === 'CanceledError') return;
+      console.error('Error fetching complaints:', error);
     }
-  };
+  }, [dispatch]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchComplaints(controller.signal);
+    return () => controller.abort();
+  }, [fetchComplaints]);
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await axios.patch(`http://localhost:8000/api/complaints/${id}/status`, { status: newStatus });
-      const response = await axios.get('http://localhost:8000/api/complaints');
+      await updateComplaintStatus(id, newStatus);
+      const response = await getComplaints();
       dispatch(setComplaintsList(response.data));
-      const updatedItem = response.data.find(c => c.id === id);
+      const updatedItem = response.data.find((c) => c.id === id);
       if (updatedItem) {
         setSelectedComplaint(updatedItem);
       }

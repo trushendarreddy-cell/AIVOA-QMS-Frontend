@@ -1,4 +1,3 @@
-import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
   setPrompt, 
@@ -11,7 +10,13 @@ import {
   setSaveStatus, 
   setComplaintsList 
 } from '../store/complaintSlice';
-import axios from 'axios';
+import {
+  getComplaints,
+  saveComplaint,
+  checkDuplicate,
+  uploadAndExtract,
+  extractFromState,
+} from '../services/api';
 
 const ComplaintForm = () => {
   const dispatch = useDispatch();
@@ -28,9 +33,7 @@ const ComplaintForm = () => {
     dispatch(setSaveStatus(''));
     dispatch(setDuplicateWarning(null));
     try {
-      const response = await axios.post('http://localhost:8000/api/upload-extract', formDataObj, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await uploadAndExtract(formDataObj);
       if (response.data.rawText) {
         dispatch(setPrompt(response.data.rawText));
       }
@@ -60,10 +63,7 @@ const ComplaintForm = () => {
     dispatch(setDuplicateWarning(null));
     try {
       // NEW DATA FLOW: Passing current_state to allow for delta edits
-      const response = await axios.post('http://localhost:8000/api/extract', { 
-        prompt: prompt,
-        current_state: formData 
-      });
+      const response = await extractFromState(prompt, formData);
       
       if (response.data.extracted) {
         dispatch(setExtractedData(response.data.extracted));
@@ -90,7 +90,7 @@ const ComplaintForm = () => {
     e.preventDefault();
     try {
       // Check for duplicates before saving
-      const dupCheck = await axios.post('http://localhost:8000/api/check-duplicate', {
+      const dupCheck = await checkDuplicate({
         customerName: formData.customerName,
         productId: formData.productId,
         batchNumber: formData.batchNumber
@@ -102,7 +102,7 @@ const ComplaintForm = () => {
         return; 
       }
 
-      await axios.post('http://localhost:8000/api/complaints', {
+      await saveComplaint({
         extracted: formData,
         riskAssessment: riskAssessment,
         completenessData: completenessData
@@ -110,7 +110,7 @@ const ComplaintForm = () => {
       dispatch(setSaveStatus('Record committed to MySQL audit trail successfully!'));
       dispatch(setDuplicateWarning(null));
       
-      const res = await axios.get('http://localhost:8000/api/complaints');
+      const res = await getComplaints();
       dispatch(setComplaintsList(res.data));
     } catch (error) {
       console.error('Error saving complaint:', error);
