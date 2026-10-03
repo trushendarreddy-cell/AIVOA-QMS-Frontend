@@ -69,14 +69,30 @@ React UI
 
 ```bash
 npm install
+cp .env.example .env      # optional, see below
 npm run dev
 ```
 
-For a production build:
+### Pointing at a backend
+
+The API base URL defaults to `http://localhost:8000`. To use a different
+host, set `VITE_API_BASE_URL` in `.env`:
+
+```
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+Every request goes through `src/services/api.js`, so this is the only place
+the backend address is configured.
+
+### Lint and build
 
 ```bash
-npm run build
+npm run lint     # eslint
+npm run build    # production bundle
 ```
+
+CI runs both on every push.
 
 ## Related repository
 
@@ -85,6 +101,10 @@ The API, AI workflow, database layer, and complaint-processing logic live in the
 ## Project status
 
 This is a working product-oriented prototype. The interface and API workflow are designed around an actual complaint-review process. Enterprise authentication, permissions, audit infrastructure, and regulated validation are outside the scope of this project.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
 
 ## Author
 
