@@ -4,6 +4,8 @@ AIVOA-QMS is a pharmaceutical complaint-management system built around a simple 
 
 This repository contains the frontend of that system. It gives a quality user one place to submit a complaint, review the extracted information, inspect the AI-assisted assessment, and move the complaint through its lifecycle.
 
+![The complaint review interface, with the complaint form, the AI copilot panel, and a logged complaints table showing lifecycle status and AI risk level](docs/images/app.jpg)
+
 ## What the product does
 
 - Complaint entry from natural-language text
